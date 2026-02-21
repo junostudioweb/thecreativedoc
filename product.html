@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Minimal UI Components — Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --white: #FAFAF8;
+      --black: #111110;
+      --mid: #6B6B68;
+      --light: #E8E8E4;
+      --tag-bg: #F0F0EC;
+    }
+
+    html { font-size: 16px; }
+    body {
+      background: var(--white);
+      color: var(--black);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--white);
+      border-bottom: 1px solid var(--light);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 48px;
+      height: 64px;
+    }
+
+    .nav-logo {
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--black);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 0.875rem;
+      font-weight: 300;
+      color: var(--mid);
+      text-decoration: none;
+      letter-spacing: 0.01em;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover, .nav-links a.active { color: var(--black); font-weight: 400; }
+
+    .nav-cta {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--black);
+      border: 1px solid var(--black);
+      padding: 8px 20px;
+      text-decoration: none;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .nav-cta:hover { background: var(--black); color: var(--white); }
+
+    /* ── BREADCRUMB ── */
+    .breadcrumb {
+      padding: 20px 48px;
+      border-bottom: 1px solid var(--light);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.75rem;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      color: var(--mid);
+      opacity: 0;
+      animation: fadeUp 0.4s ease forwards 0.05s;
+    }
+
+    .breadcrumb a {
+      color: var(--mid);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .breadcrumb a:hover { color: var(--black); }
+
+    .breadcrumb-sep { opacity: 0.4; }
+    .breadcrumb-current { color: var(--black); font-weight: 500; }
+
+    /* ── LAYOUT ── */
+    .page {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      min-height: calc(100vh - 113px);
+      border-bottom: 1px solid var(--light);
+    }
+
+    /* ── LEFT: PREVIEW ── */
+    .preview-col {
+      border-right: 1px solid var(--light);
+      padding: 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      opacity: 0;
+      animation: fadeUp 0.5s ease forwards 0.15s;
+    }
+
+    .preview-main {
+      width: 100%;
+      aspect-ratio: 4/3;
+      background: var(--tag-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Decorative UI mock inside preview */
+    .mock {
+      width: 78%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .mock-bar {
+      height: 10px;
+      background: var(--light);
+      border-radius: 2px;
+    }
+    .mock-bar.short { width: 45%; }
+    .mock-bar.med   { width: 70%; }
+    .mock-bar.full  { width: 100%; }
+    .mock-bar.dark  { background: #D0D0CA; }
+
+    .mock-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .mock-card {
+      flex: 1;
+      background: var(--white);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      border: 1px solid var(--light);
+    }
+
+    .mock-dot {
+      width: 24px;
+      height: 24px;
+      background: var(--light);
+      border-radius: 50%;
+    }
+
+    .mock-btn {
+      height: 28px;
+      background: var(--black);
+      opacity: 0.12;
+      border-radius: 1px;
+      width: 60%;
+    }
+
+    .preview-thumbs {
+      display: flex;
+      gap: 12px;
+    }
+
+    .thumb {
+      flex: 1;
+      aspect-ratio: 4/3;
+      background: var(--tag-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color 0.18s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .thumb.active { border-color: var(--black); }
+    .thumb:hover { border-color: var(--mid); }
+
+    .thumb-label {
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--mid);
+    }
+
+    /* ── RIGHT: INFO ── */
+    .info-col {
+      padding: 48px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      opacity: 0;
+      animation: fadeUp 0.5s ease forwards 0.25s;
+    }
+
+    .info-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .tag {
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--mid);
+      background: var(--tag-bg);
+      padding: 3px 10px;
+    }
+
+    .info-col h1 {
+      font-size: 1.6rem;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      line-height: 1.2;
+      margin-bottom: 14px;
+    }
+
+    .info-col .desc {
+      font-size: 0.9rem;
+      font-weight: 300;
+      color: var(--mid);
+      line-height: 1.7;
+      margin-bottom: 32px;
+    }
+
+    /* price */
+    .price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 24px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--light);
+    }
+
+    .price {
+      font-size: 2rem;
+      font-weight: 600;
+      letter-spacing: -0.04em;
+    }
+
+    .price-currency {
+      font-size: 0.8rem;
+      font-weight: 300;
+      color: var(--mid);
+      letter-spacing: 0.04em;
+    }
+
+    .price-note {
+      font-size: 0.75rem;
+      font-weight: 300;
+      color: var(--mid);
+      margin-left: auto;
+    }
+
+    /* buy button */
+    .btn-primary {
+      width: 100%;
+      padding: 16px;
+      background: var(--black);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border: none;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      margin-bottom: 12px;
+    }
+
+    .btn-primary:hover { opacity: 0.82; }
+
+    .btn-secondary {
+      width: 100%;
+      padding: 14px;
+      background: none;
+      color: var(--black);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border: 1px solid var(--light);
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+      margin-bottom: 32px;
+    }
+
+    .btn-secondary:hover { border-color: var(--black); }
+
+    /* compat */
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--mid);
+      margin-bottom: 14px;
+    }
+
+    .compat-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 32px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--light);
+    }
+
+    .compat-pill {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.78rem;
+      font-weight: 400;
+      color: var(--black);
+      background: var(--tag-bg);
+      padding: 6px 14px;
+      border: 1px solid var(--light);
+    }
+
+    .compat-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--black);
+      border-radius: 50%;
+      opacity: 0.25;
+    }
+
+    /* features */
+    .features {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 32px;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: 0.85rem;
+      font-weight: 300;
+      color: var(--black);
+      line-height: 1.5;
+    }
+
+    .feature-check {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      margin-top: 2px;
+      border: 1px solid var(--light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.6rem;
+    }
+
+    /* delivery note */
+    .delivery-note {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.75rem;
+      font-weight: 300;
+      color: var(--mid);
+      padding-top: 24px;
+      border-top: 1px solid var(--light);
+      margin-top: auto;
+    }
+
+    .delivery-icon {
+      font-size: 1rem;
+      opacity: 0.5;
+    }
+
+    /* ── RELATED ── */
+    .related {
+      padding: 56px 48px 80px;
+      opacity: 0;
+      animation: fadeUp 0.5s ease forwards 0.4s;
+    }
+
+    .related-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--light);
+    }
+
+    .related-header h2 {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--mid);
+    }
+
+    .related-link {
+      font-size: 0.75rem;
+      font-weight: 400;
+      color: var(--mid);
+      text-decoration: none;
+      letter-spacing: 0.04em;
+      transition: color 0.2s;
+    }
+
+    .related-link:hover { color: var(--black); }
+
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--light);
+      border: 1px solid var(--light);
+    }
+
+    .related-card {
+      background: var(--white);
+      padding: 28px 24px 24px;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      transition: background 0.2s;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .related-card:hover { background: #F5F5F1; }
+
+    .related-thumb {
+      width: 100%;
+      aspect-ratio: 4/3;
+      background: var(--tag-bg);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      opacity: 0.15;
+    }
+
+    .related-tag {
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--mid);
+      margin-bottom: 6px;
+    }
+
+    .related-title {
+      font-size: 0.9rem;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      margin-bottom: 12px;
+    }
+
+    .related-price {
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      margin-top: auto;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--light);
+      padding: 28px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-logo {
+      font-size: 0.875rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .footer-note {
+      font-size: 0.78rem;
+      font-weight: 300;
+      color: var(--mid);
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .page { grid-template-columns: 1fr; }
+      .preview-col { border-right: none; border-bottom: 1px solid var(--light); }
+      .info-col { padding: 36px 48px; }
+      .related-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      nav, .breadcrumb, .related, footer { padding-left: 20px; padding-right: 20px; }
+      .nav-links { display: none; }
+      .preview-col, .info-col { padding: 24px 20px; }
+      .related-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="store.html" class="nav-logo">Studio.</a>
+    <ul class="nav-links">
+      <li><a href="store.html" class="active">Shop</a></li>
+      <li><a href="#">About</a></li>
+      <li><a href="#">Contact</a></li>
+    </ul>
+    <a href="mailto:hello@yourstudio.com" class="nav-cta">Get in touch</a>
+  </nav>
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb">
+    <a href="store.html">Shop</a>
+    <span class="breadcrumb-sep">›</span>
+    <a href="#">Design Assets</a>
+    <span class="breadcrumb-sep">›</span>
+    <span class="breadcrumb-current">Minimal UI Components</span>
+  </div>
+
+  <!-- MAIN LAYOUT -->
+  <div class="page">
+
+    <!-- LEFT: PREVIEW -->
+    <div class="preview-col">
+      <div class="preview-main">
+        <div class="mock">
+          <div class="mock-bar dark short"></div>
+          <div class="mock-bar med"></div>
+          <div class="mock-row">
+            <div class="mock-card">
+              <div class="mock-dot"></div>
+              <div class="mock-bar short"></div>
+              <div class="mock-bar full"></div>
+              <div class="mock-btn"></div>
+            </div>
+            <div class="mock-card">
+              <div class="mock-dot"></div>
+              <div class="mock-bar short"></div>
+              <div class="mock-bar med"></div>
+              <div class="mock-btn"></div>
+            </div>
+            <div class="mock-card">
+              <div class="mock-dot"></div>
+              <div class="mock-bar short"></div>
+              <div class="mock-bar full"></div>
+              <div class="mock-btn"></div>
+            </div>
+          </div>
+          <div class="mock-bar full"></div>
+          <div class="mock-bar med"></div>
+        </div>
+      </div>
+
+      <div class="preview-thumbs">
+        <div class="thumb active"><span class="thumb-label">Overview</span></div>
+        <div class="thumb"><span class="thumb-label">Components</span></div>
+        <div class="thumb"><span class="thumb-label">Tokens</span></div>
+        <div class="thumb"><span class="thumb-label">Detail</span></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: INFO -->
+    <div class="info-col">
+      <div class="info-meta">
+        <span class="tag">UI Kit</span>
+        <span class="tag">Figma</span>
+      </div>
+
+      <h1>Minimal UI Components</h1>
+      <p class="desc">A clean, production-ready Figma component library built for speed and precision. 120+ accessible UI elements — all auto-layout ready, fully tokenized, and designed to slot straight into your workflow.</p>
+
+      <div class="price-row">
+        <span class="price">$34</span>
+        <span class="price-currency">USD</span>
+        <span class="price-note">One-time purchase</span>
+      </div>
+
+      <button class="btn-primary">Buy Now</button>
+      <button class="btn-secondary">Preview Free Sample</button>
+
+      <!-- COMPATIBILITY -->
+      <p class="section-label">Works with</p>
+      <div class="compat-grid">
+        <div class="compat-pill"><span class="compat-dot"></span> Figma</div>
+        <div class="compat-pill"><span class="compat-dot"></span> Figma Tokens</div>
+        <div class="compat-pill"><span class="compat-dot"></span> Auto Layout</div>
+        <div class="compat-pill"><span class="compat-dot"></span> Variables API</div>
+        <div class="compat-pill"><span class="compat-dot"></span> Web / Mobile</div>
+      </div>
+
+      <!-- FEATURES -->
+      <p class="section-label">What's included</p>
+      <div class="features">
+        <div class="feature-item">
+          <span class="feature-check">✓</span>
+          120+ UI components — buttons, inputs, modals, cards, navigation, and more
+        </div>
+        <div class="feature-item">
+          <span class="feature-check">✓</span>
+          Full design token system — typography, color, spacing, radius, and shadow
+        </div>
+        <div class="feature-item">
+          <span class="feature-check">✓</span>
+          Light & dark mode variants for every component
+        </div>
+        <div class="feature-item">
+          <span class="feature-check">✓</span>
+          Auto-layout ready — resize freely without breaking layouts
+        </div>
+        <div class="feature-item">
+          <span class="feature-check">✓</span>
+          WCAG 2.1 AA accessible color contrast throughout
+        </div>
+        <div class="feature-item">
+          <span class="feature-check">✓</span>
+          Lifetime updates included
+        </div>
+      </div>
+
+      <div class="delivery-note">
+        <span class="delivery-icon">↓</span>
+        Instant download after purchase · .fig file + documentation PDF
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RELATED PRODUCTS -->
+  <section class="related">
+    <div class="related-header">
+      <h2>You might also like</h2>
+      <a href="store.html" class="related-link">View all products →</a>
+    </div>
+    <div class="related-grid">
+      <a href="#" class="related-card">
+        <div class="related-thumb">✦</div>
+        <p class="related-tag">Icon Kit</p>
+        <p class="related-title">Outline Icon System</p>
+        <p class="related-price">$19 <span style="font-size:0.75rem; font-weight:300; color:var(--mid);">USD</span></p>
+      </a>
+      <a href="#" class="related-card">
+        <div class="related-thumb">◈</div>
+        <p class="related-tag">Figma</p>
+        <p class="related-title">Brand Identity Deck</p>
+        <p class="related-price">$18 <span style="font-size:0.75rem; font-weight:300; color:var(--mid);">USD</span></p>
+      </a>
+      <a href="#" class="related-card">
+        <div class="related-thumb">◐</div>
+        <p class="related-tag">Font</p>
+        <p class="related-title">Display Font Trio</p>
+        <p class="related-price">$28 <span style="font-size:0.75rem; font-weight:300; color:var(--mid);">USD</span></p>
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <span class="footer-logo">Studio.</span>
+    <span class="footer-note">Instant digital delivery · All sales final</span>
+  </footer>
+
+</body>
+</html>
